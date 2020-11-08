@@ -1,0 +1,6 @@
+name "dangel"
+description "D AngelScript binding"
+authors "Luna Nielsen"
+copyright "Copyright © 2020, Luna Nielsen"
+license "BSD 2-Clause"
+libs "as_c" "angelscript"

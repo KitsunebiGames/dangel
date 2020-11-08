@@ -1,0 +1,6 @@
+name "test"
+description "A minimal D application."
+authors "clipsey"
+copyright "Copyright © 2020, clipsey"
+license "proprietary"
+dependency "dangel" version="~>1.0.0"
