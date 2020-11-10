@@ -8,6 +8,11 @@ public import as.context;
 public import as.tinf;
 public import as.obj;
 
+enum CDECL = asECallConvTypes.asCALL_CDECL;
+enum DCall = asECallConvTypes.asCALL_DDECL;
+enum DCallObjLast = asECallConvTypes.asCALL_DDECL_OBJLAST;
+enum DCallObjFirst = asECallConvTypes.asCALL_DDECL_OBJFIRST;
+
 /**
     Gets the version of the angelscript library
 */
