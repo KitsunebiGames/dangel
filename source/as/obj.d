@@ -2,7 +2,6 @@ module as.obj;
 import as.def;
 import as.engine;
 import std.string;
-import std.exception;
 
 class ScriptObject {
 private:
@@ -55,7 +54,7 @@ public:
     */
     int getPropertyTypeId(asUINT prop) {
         int err = asObject_GetPropertyTypeId(obj, prop);
-        enforce(err != asERetCodes.asINVALID_ARG, "prop is too large");
+        assert(err != asERetCodes.asINVALID_ARG, "prop is too large");
         return err;
     }
 
@@ -78,8 +77,8 @@ public:
     */
     void copyFrom(ScriptObject other) {
         int err = asObject_CopyFrom(obj, other.obj);
-        enforce(err != asERetCodes.asINVALID_ARG, "Argument is null");
-        enforce(err != asERetCodes.asINVALID_TYPE, "Types of objects didn't match");
+        assert(err != asERetCodes.asINVALID_ARG, "Argument is null");
+        assert(err != asERetCodes.asINVALID_TYPE, "Types of objects didn't match");
     }
 
     /**

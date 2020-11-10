@@ -3,7 +3,6 @@ import as.def;
 import as.engine;
 import as.func;
 import std.string;
-import std.exception;
 
 enum ModuleCreateFlags : asEGMFlags {
     /**
@@ -80,12 +79,12 @@ public:
     */
     void build() {
         int err = asModule_Build(mod);
-        enforce(err != asERetCodes.asINVALID_CONFIGURATION, "Invalid configuration");
-        enforce(err != asERetCodes.asERROR, "Failed to compile script");
-        enforce(err != asERetCodes.asBUILD_IN_PROGRESS, "Another thread is currently building");
-        enforce(err != asERetCodes.asINIT_GLOBAL_VARS_FAILED, "Unable to initialize at least one global variable");
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "Compiler support disabled");
-        enforce(err != asERetCodes.asMODULE_IS_IN_USE, "Code is in use and can't be removed");
+        assert(err != asERetCodes.asINVALID_CONFIGURATION, "Invalid configuration");
+        assert(err != asERetCodes.asERROR, "Failed to compile script");
+        assert(err != asERetCodes.asBUILD_IN_PROGRESS, "Another thread is currently building");
+        assert(err != asERetCodes.asINIT_GLOBAL_VARS_FAILED, "Unable to initialize at least one global variable");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "Compiler support disabled");
+        assert(err != asERetCodes.asMODULE_IS_IN_USE, "Code is in use and can't be removed");
     }
 
     /**

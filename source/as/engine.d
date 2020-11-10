@@ -1,7 +1,6 @@
 module as.engine;
 import as.def;
 import std.string;
-import std.exception;
 import std.traits;
 import as;
 
@@ -52,7 +51,7 @@ public:
     */
     void setProperty(asEEngineProp property, asPWORD value) {
         int err = asEngine_SetEngineProperty(engine, property, value);
-        enforce(err != asERetCodes.asINVALID_ARG, "Invalid argument");
+        assert(err != asERetCodes.asINVALID_ARG, "Invalid argument");
     }
 
     /**
@@ -69,8 +68,8 @@ public:
     */
     void setMessageCallback(MessageCallback callback) {
         int err = asEngine_SetMessageCallback(engine, cast(asFUNCTION_t)callback, null, CDECL);
-        enforce(err != asERetCodes.asINVALID_ARG, "Invalid argument");
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "Not supported");
+        assert(err != asERetCodes.asINVALID_ARG, "Invalid argument");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "Not supported");
     }
 
     /**
@@ -94,12 +93,12 @@ public:
     */
     void registerGlobalFunction(T)(string declaration, T func, void* aux = null) if (isFunctionPointer!T) {
         int err = asEngine_RegisterGlobalFunction(engine, declaration.toStringz, cast(asFUNCTION_t)func, DCall, aux);
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "Not supported");
-        enforce(err != asERetCodes.asWRONG_CALLING_CONV, "Wrong calling convetion");
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Function declaration is invalid");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Function name is already taken");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "Function is already registered");
-        enforce(err != asERetCodes.asINVALID_ARG, "Invalid argument");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "Not supported");
+        assert(err != asERetCodes.asWRONG_CALLING_CONV, "Wrong calling convetion");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Function declaration is invalid");
+        assert(err != asERetCodes.asNAME_TAKEN, "Function name is already taken");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "Function is already registered");
+        assert(err != asERetCodes.asINVALID_ARG, "Invalid argument");
     }
 
     /**
@@ -128,10 +127,10 @@ public:
     */
     void registerGlobalProperty(T)(string declaration, ref T pointer) {
         int err = asEngine_RegisterGlobalProperty(engine, declaration.toStringz, cast(void*)&pointer);
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Declaration is invalid");
-        enforce(err != asERetCodes.asINVALID_TYPE, "Declaration type is invalid");
-        enforce(err != asERetCodes.asINVALID_ARG, "Reference is null");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already taken");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Declaration is invalid");
+        assert(err != asERetCodes.asINVALID_TYPE, "Declaration type is invalid");
+        assert(err != asERetCodes.asINVALID_ARG, "Reference is null");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name is already taken");
     }
 
     /**
@@ -154,7 +153,7 @@ public:
         asDWORD c_accessMask;
 
         int err = asEngine_GetGlobalPropertyByIndex(engine, index, &c_name, &c_namespace, &c_typeId, &c_isConst, &c_configGroup, &c_ptr, &c_accessMask);
-        enforce(err != asERetCodes.asINVALID_ARG, "Index is too large");
+        assert(err != asERetCodes.asINVALID_ARG, "Index is too large");
         
         // move all this data to the appropriate place
         name = cast(string)c_name.fromStringz.idup;
@@ -171,7 +170,7 @@ public:
     */
     int getGlobalPropertyIndexByName(string name) {
         int err = asEngine_GetGlobalPropertyIndexByName(engine, name.toStringz);
-        enforce(err != asERetCodes.asNO_GLOBAL_VAR, "No matching property was found");
+        assert(err != asERetCodes.asNO_GLOBAL_VAR, "No matching property was found");
         return err;
     }
 
@@ -180,8 +179,8 @@ public:
     */
     int getGlobalPropertyIndexByDecl(string decl) {
         int err = asEngine_GetGlobalPropertyIndexByDecl(engine, decl.toStringz);
-        enforce(err != asERetCodes.asNO_GLOBAL_VAR, "No matching property was found");
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        assert(err != asERetCodes.asNO_GLOBAL_VAR, "No matching property was found");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
         return err;
     }
 
@@ -190,13 +189,13 @@ public:
     */
     void registerObjectType(string name, int byteSize, asDWORD flags) {
         int err = asEngine_RegisterObjectType(engine, name.toStringz, byteSize, flags);
-        enforce(err != asERetCodes.asINVALID_ARG, "Invalid flags");
-        enforce(err != asERetCodes.asINVALID_NAME, "Invalid name");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "An object with the same name already exists");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already taken by an other symbol");
-        enforce(err != asERetCodes.asLOWER_ARRAY_DIMENSION_NOT_REGISTERED, "Registered array type element must be a primitive or registered type");
-        enforce(err != asERetCodes.asINVALID_TYPE, "Array type was malformed");
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "Array type is not supported or already in use.");
+        assert(err != asERetCodes.asINVALID_ARG, "Invalid flags");
+        assert(err != asERetCodes.asINVALID_NAME, "Invalid name");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "An object with the same name already exists");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name is already taken by an other symbol");
+        assert(err != asERetCodes.asLOWER_ARRAY_DIMENSION_NOT_REGISTERED, "Registered array type element must be a primitive or registered type");
+        assert(err != asERetCodes.asINVALID_TYPE, "Array type was malformed");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "Array type is not supported or already in use.");
     }
 
     /**
@@ -204,10 +203,10 @@ public:
     */
     void registerObjectProperty(string obj, string decl, int byteOffset) {
         int err = asEngine_RegisterObjectProperty(engine, obj.toStringz, decl.toStringz, byteOffset);
-        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
-        enforce(err != asERetCodes.asINVALID_OBJECT, "obj does not specify an object type");
-        enforce(err != asERetCodes.asINVALID_TYPE, "obj parameter syntax invalid");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name conflicts with other members");
+        assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
+        assert(err != asERetCodes.asINVALID_OBJECT, "obj does not specify an object type");
+        assert(err != asERetCodes.asINVALID_TYPE, "obj parameter syntax invalid");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name conflicts with other members");
     }
 
     /**
@@ -215,14 +214,14 @@ public:
     */
     void registerObjectMethod(T)(string obj, string decl, T func, asDWORD callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
         int err = asEngine_RegisterObjectMethod(engine, obj.toStringz, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
-        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "The calling convention is not supported");
-        enforce(err != asERetCodes.asINVALID_TYPE, "obj parameter syntax invalid");
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name conflicts with other members");
-        enforce(err != asERetCodes.asWRONG_CALLING_CONV, "The function's calling convention is not compatible with callConv");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "The method is already registered with the same parameter list");
-        enforce(err != asERetCodes.asINVALID_ARG, "aux pointer was not set according to calling convention");
+        assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "The calling convention is not supported");
+        assert(err != asERetCodes.asINVALID_TYPE, "obj parameter syntax invalid");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name conflicts with other members");
+        assert(err != asERetCodes.asWRONG_CALLING_CONV, "The function's calling convention is not compatible with callConv");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "The method is already registered with the same parameter list");
+        assert(err != asERetCodes.asINVALID_ARG, "aux pointer was not set according to calling convention");
     }
 
     /**
@@ -230,14 +229,14 @@ public:
     */
     void registerObjectBehaviour(T)(string obj, asEBehaviours behaviour, string decl, T func, asDWORD callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
         int err = asEngine_RegisterObjectBehaviour(engine, obj.toStringz, behaviour, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
-        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
-        enforce(err != asERetCodes.asINVALID_ARG, "obj not set, global behaviour given in behaviour or the objForThiscall pointer wasn't set correctly");
-        enforce(err != asERetCodes.asWRONG_CALLING_CONV, "The function's calling convention is not compatible with callConv");
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "The calling convention or behaviour signature is not supported");
-        enforce(err != asERetCodes.asINVALID_TYPE, "Invalid obj parameter");
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
-        enforce(err != asERetCodes.asILLEGAL_BEHAVIOUR_FOR_TYPE, "Illegal behaviour for type");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "The method is already registered with the same parameter list");
+        assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
+        assert(err != asERetCodes.asINVALID_ARG, "obj not set, global behaviour given in behaviour or the objForThiscall pointer wasn't set correctly");
+        assert(err != asERetCodes.asWRONG_CALLING_CONV, "The function's calling convention is not compatible with callConv");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "The calling convention or behaviour signature is not supported");
+        assert(err != asERetCodes.asINVALID_TYPE, "Invalid obj parameter");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        assert(err != asERetCodes.asILLEGAL_BEHAVIOUR_FOR_TYPE, "Illegal behaviour for type");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "The method is already registered with the same parameter list");
     }
 
     /**
@@ -245,10 +244,10 @@ public:
     */
     void registerInterface(string name) {
         int err = asEngine_RegisterInterface(engine, name.toStringz);
-        enforce(err != asERetCodes.asINVALID_NAME, "Name is null or reserved keyword");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "Object type with this name already exists");
-        enforce(err != asERetCodes.asERROR, "Name is not a proper identifier");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already used elsewhere");
+        assert(err != asERetCodes.asINVALID_NAME, "Name is null or reserved keyword");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "Object type with this name already exists");
+        assert(err != asERetCodes.asERROR, "Name is not a proper identifier");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name is already used elsewhere");
     }
 
     /**
@@ -256,10 +255,10 @@ public:
     */
     void registerInterfaceMethod(string intf, string decl) {
         int err = asEngine_RegisterInterfaceMethod(engine, intf.toStringz, decl.toStringz);
-        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Interface was registered in a different config group");
-        enforce(err != asERetCodes.asINVALID_TYPE, "intf is not an interface");
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already taken");
+        assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Interface was registered in a different config group");
+        assert(err != asERetCodes.asINVALID_TYPE, "intf is not an interface");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name is already taken");
     }
 
     /**
@@ -282,8 +281,8 @@ public:
     */
     void registerStringFactory(string type, asGETSTRINGCONSTFUNC_t getStr, asRELEASESTRINGCONSTFUNC_t releaseStr, asGETRAWSTRINGDATAFUNC_t getRawStr) {
         int err = asEngine_RegisterStringFactory(engine, type.toStringz, getStr, releaseStr, getRawStr);
-        enforce(err != asERetCodes.asINVALID_ARG, "The factory is null");
-        enforce(err != asERetCodes.asINVALID_TYPE, "Type is not valid or it is a reference/handle.");
+        assert(err != asERetCodes.asINVALID_ARG, "The factory is null");
+        assert(err != asERetCodes.asINVALID_TYPE, "Type is not valid or it is a reference/handle.");
     }
 
     /**
@@ -291,7 +290,7 @@ public:
     */
     asUINT getStringFactoryReturnTypeId(asDWORD* flags = null) {
         asUINT err = asEngine_GetStringFactoryReturnTypeId(engine, flags);
-        enforce(err != asERetCodes.asNO_FUNCTION, "String factory has not been registered");
+        assert(err != asERetCodes.asNO_FUNCTION, "String factory has not been registered");
         return err;
     }
 
@@ -300,7 +299,7 @@ public:
     */
     void registerDefaultArrayType(string type) {
         int err = asEngine_RegisterDefaultArrayType(engine, type.toStringz);
-        enforce(err != asERetCodes.asINVALID_TYPE, "Type is not a template type");
+        assert(err != asERetCodes.asINVALID_TYPE, "Type is not a template type");
     }
 
     /**
@@ -308,7 +307,7 @@ public:
     */
     int getDefaultArrayTypeId() {
         int err = asEngine_GetDefaultArrayTypeId(engine);
-        enforce(err != asERetCodes.asINVALID_TYPE, "Array type has not been registered");
+        assert(err != asERetCodes.asINVALID_TYPE, "Array type has not been registered");
         return err;
     }
 
@@ -328,10 +327,10 @@ public:
     */
     void registerEnum(string type) {
         int err = asEngine_RegisterEnum(engine, type.toStringz);
-        enforce(err != asERetCodes.asINVALID_NAME, "Invalid name");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "Already registered");
-        enforce(err != asERetCodes.asERROR, "Couldn't parse type");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name already taken");
+        assert(err != asERetCodes.asINVALID_NAME, "Invalid name");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "Already registered");
+        assert(err != asERetCodes.asERROR, "Couldn't parse type");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name already taken");
     }
 
     /**
@@ -339,9 +338,9 @@ public:
     */
     void registerEnumValue(string type, string name, int value) {
         int err = asEngine_RegisterEnumValue(engine, type.toStringz, name.toStringz, value);
-        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Wrong config group");
-        enforce(err != asERetCodes.asINVALID_TYPE, "Invalid type");
-        enforce(err != asERetCodes.asALREADY_REGISTERED, "Already registered");
+        assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Wrong config group");
+        assert(err != asERetCodes.asINVALID_TYPE, "Invalid type");
+        assert(err != asERetCodes.asALREADY_REGISTERED, "Already registered");
     }
 
     /**
@@ -361,9 +360,9 @@ public:
 
     void registerFuncDef(string decl) {
         int err = asEngine_RegisterFuncdef(engine, decl.toStringz);
-        enforce(err != asERetCodes.asINVALID_ARG, "Declaration not given");
-        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid function definition");
-        enforce(err != asERetCodes.asNAME_TAKEN, "Name conflicts with an other name");
+        assert(err != asERetCodes.asINVALID_ARG, "Declaration not given");
+        assert(err != asERetCodes.asINVALID_DECLARATION, "Invalid function definition");
+        assert(err != asERetCodes.asNAME_TAKEN, "Name conflicts with an other name");
     }
 
     /**
@@ -386,8 +385,8 @@ public:
     */
     void beginConfigGroup(string groupName) {
         int err = asEngine_BeginConfigGroup(engine, groupName.toStringz);
-        enforce(err != asERetCodes.asNAME_TAKEN, "Group name is already in use");
-        enforce(err != asERetCodes.asNOT_SUPPORTED, "Nested configuration groups isn't supported");
+        assert(err != asERetCodes.asNAME_TAKEN, "Group name is already in use");
+        assert(err != asERetCodes.asNOT_SUPPORTED, "Nested configuration groups isn't supported");
     }
 
     /**
@@ -395,7 +394,7 @@ public:
     */
     void endConfigGroup() {
         int err = asEngine_EndConfigGroup(engine);
-        enforce(err != asERetCodes.asERROR, "No configuration groups to end");
+        assert(err != asERetCodes.asERROR, "No configuration groups to end");
     }
 
     /**
@@ -403,7 +402,7 @@ public:
     */
     void removeConfigGroup(string groupName) {
         int err = asEngine_RemoveConfigGroup(engine, groupName.toStringz);
-        enforce(err != asERetCodes.asCONFIG_GROUP_IS_IN_USE, "Group is in use and can't be removed");
+        assert(err != asERetCodes.asCONFIG_GROUP_IS_IN_USE, "Group is in use and can't be removed");
     }
 
     /**
@@ -418,7 +417,7 @@ public:
     */
     void setDefaultNamespace(string nameSpace) {
         int err = asEngine_SetDefaultNamespace(engine, nameSpace.toStringz);
-        enforce(err != asERetCodes.asINVALID_ARG, "Invalid namespace");
+        assert(err != asERetCodes.asINVALID_ARG, "Invalid namespace");
     }
 
     /**
