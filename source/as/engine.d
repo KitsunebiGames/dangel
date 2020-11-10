@@ -68,9 +68,7 @@ public:
         BUG: Writing message will cause a crash currently.
     */
     void setMessageCallback(MessageCallback callback) {
-
-
-        int err = asEngine_SetMessageCallback(engine, cast(asFUNCTION_t)callback, null, DCallConv);
+        int err = asEngine_SetMessageCallback(engine, cast(asFUNCTION_t)callback, null, CDECL);
         enforce(err != asERetCodes.asINVALID_ARG, "Invalid argument");
         enforce(err != asERetCodes.asNOT_SUPPORTED, "Not supported");
     }
@@ -95,7 +93,7 @@ public:
         Register a global function
     */
     void registerGlobalFunction(T)(string declaration, T func, void* aux = null) if (isFunctionPointer!T) {
-        int err = asEngine_RegisterGlobalFunction(engine, declaration.toStringz, cast(asFUNCTION_t)func, DCallConv, aux);
+        int err = asEngine_RegisterGlobalFunction(engine, declaration.toStringz, cast(asFUNCTION_t)func, DCall, aux);
         enforce(err != asERetCodes.asNOT_SUPPORTED, "Not supported");
         enforce(err != asERetCodes.asWRONG_CALLING_CONV, "Wrong calling convetion");
         enforce(err != asERetCodes.asINVALID_DECLARATION, "Function declaration is invalid");
@@ -156,7 +154,7 @@ public:
         asDWORD c_accessMask;
 
         int err = asEngine_GetGlobalPropertyByIndex(engine, index, &c_name, &c_namespace, &c_typeId, &c_isConst, &c_configGroup, &c_ptr, &c_accessMask);
-        // TODO: Report errors
+        enforce(err != asERetCodes.asINVALID_ARG, "Index is too large");
         
         // move all this data to the appropriate place
         name = cast(string)c_name.fromStringz.idup;
@@ -172,51 +170,146 @@ public:
         Gets the index of a global property by its name
     */
     int getGlobalPropertyIndexByName(string name) {
-        return asEngine_GetGlobalPropertyIndexByName(engine, name.toStringz);
+        int err = asEngine_GetGlobalPropertyIndexByName(engine, name.toStringz);
+        enforce(err != asERetCodes.asNO_GLOBAL_VAR, "No matching property was found");
+        return err;
     }
 
     /**
         Gets the index of a global property by its declaration
     */
     int getGlobalPropertyIndexByDecl(string decl) {
-        return asEngine_GetGlobalPropertyIndexByDecl(engine, decl.toStringz);
+        int err = asEngine_GetGlobalPropertyIndexByDecl(engine, decl.toStringz);
+        enforce(err != asERetCodes.asNO_GLOBAL_VAR, "No matching property was found");
+        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        return err;
     }
 
     /**
         Registers an object type
     */
     void registerObjectType(string name, int byteSize, asDWORD flags) {
-        asEngine_RegisterObjectType(engine, name.toStringz, byteSize, flags);
+        int err = asEngine_RegisterObjectType(engine, name.toStringz, byteSize, flags);
+        enforce(err != asERetCodes.asINVALID_ARG, "Invalid flags");
+        enforce(err != asERetCodes.asINVALID_NAME, "Invalid name");
+        enforce(err != asERetCodes.asALREADY_REGISTERED, "An object with the same name already exists");
+        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already taken by an other symbol");
+        enforce(err != asERetCodes.asLOWER_ARRAY_DIMENSION_NOT_REGISTERED, "Registered array type element must be a primitive or registered type");
+        enforce(err != asERetCodes.asINVALID_TYPE, "Array type was malformed");
+        enforce(err != asERetCodes.asNOT_SUPPORTED, "Array type is not supported or already in use.");
     }
 
     /**
         Registers a property for an object
     */
     void registerObjectProperty(string obj, string decl, int byteOffset) {
-        asEngine_RegisterObjectProperty(engine, obj.toStringz, decl.toStringz, byteOffset);
+        int err = asEngine_RegisterObjectProperty(engine, obj.toStringz, decl.toStringz, byteOffset);
+        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
+        enforce(err != asERetCodes.asINVALID_OBJECT, "obj does not specify an object type");
+        enforce(err != asERetCodes.asINVALID_TYPE, "obj parameter syntax invalid");
+        enforce(err != asERetCodes.asNAME_TAKEN, "Name conflicts with other members");
     }
 
     /**
         Registers a method for an object
     */
-    void registerObjectMethod(T)(string obj, string decl, T func, asDWORD callConv = DCallConv, void* aux = null) if (isFunctionPointer!T) {
-        asEngine_RegisterObjectMethod(engine, obj.toStringz, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
+    void registerObjectMethod(T)(string obj, string decl, T func, asDWORD callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
+        int err = asEngine_RegisterObjectMethod(engine, obj.toStringz, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
+        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
+        enforce(err != asERetCodes.asNOT_SUPPORTED, "The calling convention is not supported");
+        enforce(err != asERetCodes.asINVALID_TYPE, "obj parameter syntax invalid");
+        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        enforce(err != asERetCodes.asNAME_TAKEN, "Name conflicts with other members");
+        enforce(err != asERetCodes.asWRONG_CALLING_CONV, "The function's calling convention is not compatible with callConv");
+        enforce(err != asERetCodes.asALREADY_REGISTERED, "The method is already registered with the same parameter list");
+        enforce(err != asERetCodes.asINVALID_ARG, "aux pointer was not set according to calling convention");
     }
 
     /**
         Registers a behaviour for an object
     */
-    void registerObjectBehaviour(T)(string dataType, asEBehaviours behaviour, string decl, T func, asDWORD callConv = DCallConv, void* aux = null) if (isFunctionPointer!T) {
-        asEngine_RegisterObjectBehaviour(engine, dataType.toStringz, behaviour, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
+    void registerObjectBehaviour(T)(string obj, asEBehaviours behaviour, string decl, T func, asDWORD callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
+        int err = asEngine_RegisterObjectBehaviour(engine, obj.toStringz, behaviour, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
+        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
+        enforce(err != asERetCodes.asINVALID_ARG, "obj not set, global behaviour given in behaviour or the objForThiscall pointer wasn't set correctly");
+        enforce(err != asERetCodes.asWRONG_CALLING_CONV, "The function's calling convention is not compatible with callConv");
+        enforce(err != asERetCodes.asNOT_SUPPORTED, "The calling convention or behaviour signature is not supported");
+        enforce(err != asERetCodes.asINVALID_TYPE, "Invalid obj parameter");
+        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        enforce(err != asERetCodes.asILLEGAL_BEHAVIOUR_FOR_TYPE, "Illegal behaviour for type");
+        enforce(err != asERetCodes.asALREADY_REGISTERED, "The method is already registered with the same parameter list");
     }
 
-    // TODO: String Factory and Default Array Type
+    /**
+        Registers a new interface
+    */
+    void registerInterface(string name) {
+        int err = asEngine_RegisterInterface(engine, name.toStringz);
+        enforce(err != asERetCodes.asINVALID_NAME, "Name is null or reserved keyword");
+        enforce(err != asERetCodes.asALREADY_REGISTERED, "Object type with this name already exists");
+        enforce(err != asERetCodes.asERROR, "Name is not a proper identifier");
+        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already used elsewhere");
+    }
+
+    /**
+        Registers an interface method
+    */
+    void registerInterfaceMethod(string intf, string decl) {
+        int err = asEngine_RegisterInterfaceMethod(engine, intf.toStringz, decl.toStringz);
+        enforce(err != asERetCodes.asWRONG_CONFIG_GROUP, "Interface was registered in a different config group");
+        enforce(err != asERetCodes.asINVALID_TYPE, "intf is not an interface");
+        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid declaration");
+        enforce(err != asERetCodes.asNAME_TAKEN, "Name is already taken");
+    }
+
+    /**
+        Gets the count of the objects in the engine
+    */
+    asUINT getObjectTypeCount() {
+        return asEngine_GetObjectTypeCount(engine);
+    }
+
+    /**
+        Gets the type info of an object by its index
+    */
+    Type getObjectTypeByIndex(asUINT index) {
+        auto type = asEngine_GetObjectTypeByIndex(engine, index);
+        return type !is null ? new Type(this, type) : null;
+    }
 
     /**
         Registers a string factory type with the specified creation functions
     */
     void registerStringFactory(string type, asGETSTRINGCONSTFUNC_t getStr, asRELEASESTRINGCONSTFUNC_t releaseStr, asGETRAWSTRINGDATAFUNC_t getRawStr) {
-        asEngine_RegisterStringFactory(engine, type.toStringz, getStr, releaseStr, getRawStr);
+        int err = asEngine_RegisterStringFactory(engine, type.toStringz, getStr, releaseStr, getRawStr);
+        enforce(err != asERetCodes.asINVALID_ARG, "The factory is null");
+        enforce(err != asERetCodes.asINVALID_TYPE, "Type is not valid or it is a reference/handle.");
+    }
+
+    /**
+        Gets the return type id of the string type the factory returns
+    */
+    asUINT getStringFactoryReturnTypeId(asDWORD* flags = null) {
+        asUINT err = asEngine_GetStringFactoryReturnTypeId(engine, flags);
+        enforce(err != asERetCodes.asNO_FUNCTION, "String factory has not been registered");
+        return err;
+    }
+
+    /**
+        Registers the default array type
+    */
+    void registerDefaultArrayType(string type) {
+        int err = asEngine_RegisterDefaultArrayType(engine, type.toStringz);
+        enforce(err != asERetCodes.asINVALID_TYPE, "Type is not a template type");
+    }
+
+    /**
+        Gets the type id of the default array type
+    */
+    int getDefaultArrayTypeId() {
+        int err = asEngine_GetDefaultArrayTypeId(engine);
+        enforce(err != asERetCodes.asINVALID_TYPE, "Array type has not been registered");
+        return err;
     }
 
     /**
@@ -258,17 +351,78 @@ public:
         return asEngine_GetEnumCount(engine);
     }
 
+    /**
+        Gets the type of an enum by its index
+    */
+    Type getEnumByindex(asUINT index) {
+        auto type = asEngine_GetEnumByIndex(engine, index);
+        return type !is null ? new Type(this, type) : null;
+    }
+
+    void registerFuncDef(string decl) {
+        int err = asEngine_RegisterFuncdef(engine, decl.toStringz);
+        enforce(err != asERetCodes.asINVALID_ARG, "Declaration not given");
+        enforce(err != asERetCodes.asINVALID_DECLARATION, "Invalid function definition");
+        enforce(err != asERetCodes.asNAME_TAKEN, "Name conflicts with an other name");
+    }
+
+    /**
+        Gets the amount of enums registered
+    */
+    asUINT getFuncdefConut() {
+        return asEngine_GetFuncdefCount(engine);
+    }
+
+    /**
+        Gets the type of a fundef by its index
+    */
+    Type getFuncdefByIndex(asUINT index) {
+        auto type = asEngine_GetFuncdefByIndex(engine, index);
+        return type !is null ? new Type(this, type) : null;
+    }
+
+    /**
+        Starts a new dynamic configuration group
+    */
+    void beginConfigGroup(string groupName) {
+        int err = asEngine_BeginConfigGroup(engine, groupName.toStringz);
+        enforce(err != asERetCodes.asNAME_TAKEN, "Group name is already in use");
+        enforce(err != asERetCodes.asNOT_SUPPORTED, "Nested configuration groups isn't supported");
+    }
+
+    /**
+        Ends the configuration group
+    */
+    void endConfigGroup() {
+        int err = asEngine_EndConfigGroup(engine);
+        enforce(err != asERetCodes.asERROR, "No configuration groups to end");
+    }
+
+    /**
+        Removes a configuration group
+    */
+    void removeConfigGroup(string groupName) {
+        int err = asEngine_RemoveConfigGroup(engine, groupName.toStringz);
+        enforce(err != asERetCodes.asCONFIG_GROUP_IS_IN_USE, "Group is in use and can't be removed");
+    }
+
+    /**
+        Sets the access mask that should be used for subsequent registered entities
+    */
+    asDWORD setDefaultAccessMask(asDWORD defaultMask) {
+        return asEngine_SetDefaultAccessMask(engine, defaultMask);
+    }
 
     /**
         Sets the default namespace
     */
-    void setDefaultNamespace(string namespace) {
-        int err = asEngine_SetDefaultNamespace(engine, namespace.toStringz);
+    void setDefaultNamespace(string nameSpace) {
+        int err = asEngine_SetDefaultNamespace(engine, nameSpace.toStringz);
         enforce(err != asERetCodes.asINVALID_ARG, "Invalid namespace");
     }
 
     /**
-        Gets the default namespace
+        Gets the current default namespace
     */
     string getDefaultNamespace() {
         return cast(string)asEngine_GetDefaultNamespace(engine).fromStringz;
@@ -278,14 +432,16 @@ public:
         Gets a module in the engine by name
     */
     Module getModule(string name, ModuleCreateFlags flags = ModuleCreateFlags.OnlyIfExists) {
-        return new Module(this, asEngine_GetModule(engine, name.toStringz, flags));
+        auto mod = asEngine_GetModule(engine, name.toStringz, flags);
+        return mod !is null ? new Module(this, mod) : null;
     }
 
     /**
         Gets a module in the engine by index
     */
     Module getModule(asUINT index) {
-        return new Module(this, asEngine_GetModuleByIndex(engine, index));
+        auto mod = asEngine_GetModuleByIndex(engine, index);
+        return mod !is null ? new Module(this, mod) : null;
     }
 
     /**
