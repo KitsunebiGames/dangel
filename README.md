@@ -3,14 +3,10 @@ D bindings and wrapper for AngelScript with support for D strings.
 
 Do note this is still work in progress and there's currently issues with D calling conventions breaking with angelscript (will be working on patching angelscript to support D calling conventions)
 
-This library also depends on a patched C binding to angelscript that you will need to compile first, you can find that [here](https://github.com/KitsunebiGames/angelscriptc)
-
-# Why?
-Because I can, especially with the string support.  
-I'm sorry in advance, there's some cursed GC stuff going on there and I'm not sure whether it will leak memory at some point.
+This library also depends on a patched C binding to angelscript that you will need to compile first, you can find that [here](https://github.com/KitsunebiGames/angelscriptc) you will also need the [patched AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) (GCC only right now!) 
 
 # Using the binding
-First compile AngelScript and the [patched c bindings](https://github.com/KitsunebiGames/angelscriptc) **AS DYNAMIC LIBRARIES** and install the libraries to your system's library path (or whatever the heck you do on Windows)
+First compile AngelScript, the patched [AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) the [patched c bindings](https://github.com/KitsunebiGames/angelscriptc) **AS DYNAMIC LIBRARIES** and install the libraries to your system's library path (or whatever the heck you do on Windows)
 
 Then put the libraries somewhere that the D linker will be able to find them, in my case that's `/usr/lib` and `/usr/include`. You may want to ship the libraries with your application.
 
@@ -44,7 +40,6 @@ There's experimental and buggy support for registering D structs in `as.addons.d
 # There's parts of the API missing!
 I know, there's also a lot of places where I haven't done any error handling yet that will just fail silently. It will be fixed with time.
 
-# My functions don't run correctly!
-I know, there's some incompatibility between AngelScript and the D ABI's calling conventions, changing the calling convention to the C calling convention via `extern(C)` and marking your function as `asCDECL` should work around it temporarily.
-
-I'll be working on making a patched version of AngelScript that supports the D calling convention unless the creator of AngelScript decides to add it themself.
+# Why does everything assert?
+This binding is meant to be used for gamedev so I'd prefer to avoid having a bunch of exceptions thrown and checking status IDs is imho pretty ugly.  
+Therefore this library prefers if you fix bugs during debug builds and have minimal error checking in release builds.
