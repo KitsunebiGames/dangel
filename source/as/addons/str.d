@@ -3,6 +3,7 @@ import as.def;
 import as.engine;
 import core.memory;
 import std.stdio;
+import std.conv : emplace;
 
 private extern(C) {
 
@@ -28,7 +29,9 @@ private extern(C) {
         }
 
         void release() {
+            GC.free(cast(void*)proto.data);
             GC.removeRoot(&this);
+            GC.clrAttr(&this, GC.BlkAttr.FINALIZE | GC.BlkAttr.NO_MOVE);
         }
 
         size_t length() {
@@ -36,9 +39,8 @@ private extern(C) {
         }
 
         void setText(string text) {
-            GC.removeRoot(cast(void*)str);
+            GC.free(cast(void*)proto.data);
             str = text.idup;
-            GC.addRoot(cast(void*)str);
         }
 
         pstr_impl proto;
@@ -92,15 +94,12 @@ private extern(C) {
     }
 
     void strConstructor(protostring* self) {
-        self = new protostring;
-
         GC.addRoot(self);
         GC.setAttr(self, GC.BlkAttr.NO_MOVE);
     }
 
     void strDestructor(protostring* self) {
-        GC.removeRoot(self);
-        GC.clrAttr(self, GC.BlkAttr.FINALIZE | GC.BlkAttr.NO_MOVE);
+        self.release();
     }
 
     ref string strOpAssign(ref string in_, protostring* self) {
@@ -113,8 +112,8 @@ private extern(C) {
         return self.str;
     }
 
-    protostring* strOpAdd(protostring* lhs, ref string rhs) {
-        return new protostring(lhs.str~rhs);
+    ref string strOpAdd(protostring* lhs, ref string rhs) {
+        return (new protostring(lhs.str~rhs)).str;
     }
 
     uint strLength(protostring* self) {
