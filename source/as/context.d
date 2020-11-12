@@ -3,6 +3,20 @@ import as.def;
 import as.engine;
 import as.func;
 
+enum ContextState : asEContextState {
+	Finished = asEContextState.asEXECUTION_FINISHED,
+	Suspended = asEContextState.asEXECUTION_SUSPENDED,
+	Aborted = asEContextState.asEXECUTION_ABORTED,
+	Exception = asEContextState.asEXECUTION_EXCEPTION,
+	Prepared = asEContextState.asEXECUTION_PREPARED,
+	Uninitialized = asEContextState.asEXECUTION_UNINITIALIZED,
+	Active = asEContextState.asEXECUTION_ACTIVE,
+	Error = asEContextState.asEXECUTION_ERROR
+}
+
+/**
+    A script execution context
+*/
 class ScriptContext {
 private:
     ScriptEngine engine;
@@ -49,64 +63,158 @@ public:
         Prepares this context
     */
     void prepare(Function func) {
-        asContext_Prepare(ctx, func.func);
+        int err = asContext_Prepare(ctx, func.func);
+        assert(err != asERetCodes.asCONTEXT_ACTIVE, "The context is still active or suspended");
+        assert(err != asERetCodes.asNO_FUNCTION, "Function pointer is null");
+        assert(err != asERetCodes.asINVALID_ARG, "Function is from a different engine than context");
+        assert(err != asERetCodes.asOUT_OF_MEMORY, "Context ran out of memory while allocating call stack");
     }
 
     /**
         Un-prepares this context
     */
     void unprepare() {
-        asContext_Unprepare(ctx);
+        int err = asContext_Unprepare(ctx);
+        assert(err != asERetCodes.asCONTEXT_ACTIVE, "The context is still active or suspended");
     }
 
     /**
         Executes this context
     */
-    void execute() {
-        asContext_Execute(ctx);
+    ContextState execute() {
+        int err = asContext_Execute(ctx);
+        assert(err != asERetCodes.asCONTEXT_NOT_PREPARED, "The context is still active or suspended");
+        return cast(ContextState)err;
     }
 
     /**
         Aborts this context
     */
     void abort() {
-        asContext_Abort(ctx);
+        int err = asContext_Abort(ctx);
+        assert(err != asERetCodes.asERROR, "Invalid context");
     }
 
     /**
         Suspends this context
     */
     void suspend() {
-        asContext_Suspend(ctx);
+       int err = asContext_Suspend(ctx);
+        assert(err != asERetCodes.asERROR, "Invalid context");
     }
 
     /**
         Gets the current state of the context
     */
-    asEContextState getState() {
-        return asContext_GetState(ctx);
+    ContextState getState() {
+        return cast(ContextState)asContext_GetState(ctx);
     }
 
+    /**
+        Backups current state and prepares state for a nested call
+    */
     void pushState() {
-        asContext_PushState(ctx);
+        int err = asContext_PushState(ctx);
+        assert(err != asERetCodes.asERROR, "Context not active");
+        assert(err != asERetCodes.asOUT_OF_MEMORY, "Could not allocate memory for state");
     }
 
+    /**
+        Restores previous execution state
+    */
     void popState() {
-        asContext_PopState(ctx);
+        int err = asContext_PopState(ctx);
+        assert(err != asERetCodes.asERROR, "Could not restore state");
     }
 
+    /**
+        Gets whether the context has any nested calls
+    */
     bool isNested(ref uint nestCount) {
         return asContext_IsNested(ctx, &nestCount);
     }
 
+    /**
+        Sets object for class method call
+    */
     void setObject(void* obj) {
         asContext_SetObject(ctx, obj);
     }
 
+    /**
+        Sets a base type argument
+
+        Notes:
+        To set object argument values, use setArgObject
+        To set variable arguments, use setArgVarType
+    */
+    void setArg(T)(asUINT arg, T value) {
+        static if (isPointer!T) {
+            int err = asContext_SetArgAddress(ctx, arg, value);
+        } else static if (T.sizeof == 1) {
+            int err = asContext_SetArgByte(ctx, arg, cast(ubyte)value);
+        } else static if (T.sizeof == 2) {
+            int err = asContext_SetArgWord(ctx, arg, cast(asWORD)value);
+        } else static if (T.sizeof == 4) {
+            int err = asContext_SetArgDWord(ctx, arg, cast(asDWORD)value);
+        } else static if (T.sizeof == 8) {
+            int err = asContext_SetArgQWord(ctx, arg, cast(asQWORD)value);
+        } else static if (is(T : float)) {
+            int err = asContext_SetArgFloat(ctx, arg, value);
+        } else static if (is(T : double)) {
+            int err = asContext_SetArgDouble(ctx, arg, value);
+        } else {
+            assert(0, "Type not supported by setArg");
+        }
+        assert(err != asERetCodes.asCONTEXT_NOT_PREPARED, "The context is not in a prepared state");
+        assert(err != asERetCodes.asINVALID_ARG, "Argument is outside function argument bounds");
+        assert(err != asERetCodes.asINVALID_TYPE, "Value type does not fit argument type");
+    }
+
+    /**
+        Sets object/handle argument value
+    */
+    void setArgObject(asUINT arg, void* value) {
+        int err = asContext_SetArgObject(ctx, arg, value);
+        assert(err != asERetCodes.asCONTEXT_NOT_PREPARED, "The context is not in a prepared state");
+        assert(err != asERetCodes.asINVALID_ARG, "Argument is outside function argument bounds");
+        assert(err != asERetCodes.asINVALID_TYPE, "Argument is not a object or handle");
+    }
+
+    /**
+        Sets the variable argument value and type
+    */
+    void setArgVarType(T)(asUINT arg, T* ptr, int typeId) {
+        int err = asContext_SetArgVarType(ctx, arg, ptr, typeId);
+        assert(err != asERetCodes.asCONTEXT_NOT_PREPARED, "The context is not in a prepared state");
+        assert(err != asERetCodes.asINVALID_ARG, "Argument is outside function argument bounds");
+        assert(err != asERetCodes.asINVALID_TYPE, "Argument is not a variable type");
+    }
+
+    /**
+        Gets the size of the callstack (how many functions there are left to execute)
+    */
+    asUINT getCallstackSize() {
+        return asContext_GetCallstackSize(ctx);
+    }
+
+    /**
+        Gets the address of an argument
+    */
+    void* getAddressOfArg(asUINT arg) {
+        return asContext_GetAddressOfArg(ctx, arg);
+    }
+
+    /**
+        Sets the user data
+    */
     void* setUserData(void* data) {
         return asContext_SetUserData(ctx, data);
     }
 
+    /**
+        Gets the user data
+    */
     void* getUserData() {
         return asContext_GetUserData(ctx);
     }
