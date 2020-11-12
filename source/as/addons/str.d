@@ -48,27 +48,28 @@ private extern(C) {
     /**
         The cache of constant values
     */
-    int[protostring*] constantCache;
+    int[string] constantCache;
 
     // FACTORY
     void* getStringConstant(const(char)* data, asUINT length) {
         protostring* text = new protostring(cast(string)data[0..length]);
-
+        
         // Handle adding references to strings
-        if (text !in constantCache) constantCache[text] = 1;
-        else constantCache[text]++;
-
+        if (text.str !in constantCache) constantCache[text.str] = 1;
+        else constantCache[text.str]++;
+        
         return cast(void*)text;
     }
 
     int releaseStringConstant(const(void)* str) {
+        //writefln("Is str null? %s...", str is null);
         if (str is null) return asERetCodes.asERROR;
 
         auto text = cast(protostring*)str;
 
         // Handle releasing strings
-        if (text !in constantCache) return asERetCodes.asERROR;
-        else if (--constantCache[text] <= 0) constantCache.remove(text);
+        if (text.str !in constantCache) return asERetCodes.asERROR;
+        else if (--constantCache[text.str] <= 0) constantCache.remove(text.str);
 
         return asERetCodes.asSUCCESS;
     }
@@ -102,14 +103,14 @@ private extern(C) {
         GC.clrAttr(self, GC.BlkAttr.FINALIZE | GC.BlkAttr.NO_MOVE);
     }
 
-    protostring* strOpAssign(ref string in_, protostring* self) {
+    ref string strOpAssign(ref string in_, protostring* self) {
         self.setText(in_);
-        return self;
+        return self.str;
     }
 
-    protostring* strOpAddAssign(ref string in_, protostring* self) {
+    ref string strOpAddAssign(ref string in_, protostring* self) {
         self.setText(self.str~in_);
-        return self;
+        return self.str;
     }
 
     protostring* strOpAdd(protostring* lhs, ref string rhs) {
