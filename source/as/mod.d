@@ -3,6 +3,7 @@ import as.def;
 import as.engine;
 import as.func;
 import std.string;
+import as.stream;
 
 enum ModuleCreateFlags : asEGMFlags {
     /**
@@ -85,6 +86,24 @@ public:
         assert(err != asERetCodes.asINIT_GLOBAL_VARS_FAILED, "Unable to initialize at least one global variable");
         assert(err != asERetCodes.asNOT_SUPPORTED, "Compiler support disabled");
         assert(err != asERetCodes.asMODULE_IS_IN_USE, "Code is in use and can't be removed");
+    }
+
+    /**
+        Saves bytecode to a ubyte array
+    */
+    ubyte[] saveByteCode(bool stripdebugInfo = false) {
+        BinaryStream* stream = BinaryStream.create();
+        asModule_SaveByteCode(mod, stream.stream, stripdebugInfo);
+        return stream.buffer.dup;
+    }
+
+    /**
+        Loads bytecode
+    */
+    void loadByteCode(ubyte[] buffer, bool* wasDebugInfoStripped = null) {
+        BinaryStream* stream = BinaryStream.create();
+        stream.buffer = buffer;
+        asModule_LoadByteCode(mod, stream.stream, wasDebugInfoStripped);
     }
 
     /**
