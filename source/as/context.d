@@ -83,7 +83,7 @@ public:
     */
     ContextState execute() {
         int err = asContext_Execute(ctx);
-        assert(err != asERetCodes.asCONTEXT_NOT_PREPARED, "The context is still active or suspended");
+        assert(err != asERetCodes.asCONTEXT_NOT_PREPARED, "The context is still active or not suspended");
         return cast(ContextState)err;
     }
 
@@ -192,17 +192,34 @@ public:
     }
 
     /**
-        Gets the size of the callstack (how many functions there are left to execute)
+        Gets the address of an argument
+    */
+    void* getAddressOfArg(asUINT arg) {
+        return asContext_GetAddressOfArg(ctx, arg);
+    }
+
+    /**
+        Gets the size of the callstack
     */
     asUINT getCallstackSize() {
         return asContext_GetCallstackSize(ctx);
     }
 
     /**
-        Gets the address of an argument
+        Gets the line number based on stackLevel which the context is currently executing
     */
-    void* getAddressOfArg(asUINT arg) {
-        return asContext_GetAddressOfArg(ctx, arg);
+    int getLineNumber(asUINT stackLevel = 0) {
+        return getLineNumber(stackLevel, null);
+    }
+    
+    /**
+        Gets the line number, column and sectino name based on stackLevel which the context is currently executing
+    */
+    int getLineNumber(asUINT stackLevel, int* column) {
+        
+        // Get the line number and extra stuff
+        int ln = asContext_GetLineNumber(ctx, stackLevel, column, null);
+        return ln;
     }
 
     /**
