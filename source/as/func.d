@@ -138,6 +138,13 @@ public:
     }
 
     /**
+        Gets declaration
+    */
+    string getDeclaration(bool includeObjectName=true, bool includeNamespace=false) {
+        return cast(string)asFunction_GetDeclaration(func, includeObjectName, includeNamespace).fromStringz;
+    }
+
+    /**
         Gets this function's access mask
     */
     asDWORD getAccessMask() {
