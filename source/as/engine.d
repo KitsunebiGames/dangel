@@ -63,8 +63,6 @@ public:
 
     /**
         Sets the message callback
-
-        BUG: Writing message will cause a crash currently.
     */
     void setMessageCallback(MessageCallback callback) {
         int err = asEngine_SetMessageCallback(engine, cast(asFUNCTION_t)callback, null, CDECL);
