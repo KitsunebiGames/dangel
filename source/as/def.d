@@ -282,8 +282,8 @@ alias asUINT = uint;
 
 @system extern(C) {
 	alias asFUNCTION_t 					= void function();
-	alias asBINARYREADFUNC_t 			= void function(void* ptr, asUINT size, void* param);
-	alias asBINARYWRITEFUNC_t 			= void function(const(void)* ptr, asUINT size, void* param);
+	alias asBINARYREADFUNC_t 			= int function(void* ptr, asUINT size, void* param);
+	alias asBINARYWRITEFUNC_t 			= int function(const(void)* ptr, asUINT size, void* param);
 	alias asGENFUNC_t 					= void function(asIScriptGeneric*);
 	alias asALLOCFUNC_t 				= void* function(size_t);
 	alias asFREEFUNC_t 					= void function(void*);
@@ -339,6 +339,10 @@ struct asSMessageInfo {
 
 	// Auxiliary
 	asILockableSharedBool *asCreateLockableSharedBool();
+
+	///////////////////////////////////////////
+	// asIBinaryStream
+	asIBinaryStream*    asStream_Create(asBINARYREADFUNC_t read, asBINARYWRITEFUNC_t write, void* param);
 
 	///////////////////////////////////////////
 	// asIScriptEngine
