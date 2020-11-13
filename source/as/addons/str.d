@@ -140,9 +140,9 @@ private extern(C) {
 /**
     Makes a copy of a string on the heap and gets a pointer to it
 */
-string* toAS(string text) {
+ref string toAS(string text) {
     protostring* proto = new protostring(text.idup);
-    return &proto.str;
+    return proto.str;
 }
 
 /**
