@@ -48,7 +48,7 @@ enum MessageType {
     Error = asEMsgType.asMSGTYPE_ERROR
 }
 
-alias MessageCallback = extern(C) void function(void*, const(asSMessageInfo)*);
+alias MessageCallback = extern(C) void function(const(asSMessageInfo)*, void*);
 alias NativeMessage = const(asSMessageInfo)*;
 
 /**
@@ -57,7 +57,7 @@ alias NativeMessage = const(asSMessageInfo)*;
 struct MessageInfo {
 public:
     this(const(asSMessageInfo)* info) {
-        this.section = cast(string)info.section.fromStringz;
+        this.section = info.section !is null ? cast(string)info.section.fromStringz : null;
         this.row = info.row;
         this.col = info.col;
         this.type = cast(MessageType)info.type;
