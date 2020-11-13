@@ -103,7 +103,26 @@ public:
     void loadByteCode(ubyte[] buffer, bool* wasDebugInfoStripped = null) {
         BinaryStream* stream = BinaryStream.create();
         stream.buffer = buffer;
-        asModule_LoadByteCode(mod, stream.stream, wasDebugInfoStripped);
+        int err = asModule_LoadByteCode(mod, stream.stream, wasDebugInfoStripped);
+        assert(err != asERetCodes.asINVALID_ARG, "Stream not specified");
+        assert(err != asERetCodes.asBUILD_IN_PROGRESS, "Build is in progress already");
+        assert(err != asERetCodes.asOUT_OF_MEMORY, "Out of memory");
+        assert(err != asERetCodes.asMODULE_IS_IN_USE, "Code is in use and can't be removed");
+        assert(err != asERetCodes.asERROR, "It was not possible to load the bytecode");
+    }
+
+    /**
+        Gets function count
+    */
+    asUINT getFunctionCount() {
+        return asModule_GetFunctionCount(mod);
+    }
+
+    /**
+        Gets a function by index
+    */
+    Function getFunctionByIndex(asUINT index) {
+        return new Function(engine, asModule_GetFunctionByIndex(mod, index));
     }
 
     /**
