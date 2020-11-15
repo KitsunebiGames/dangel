@@ -303,4 +303,10 @@ void registerDStrings(ScriptEngine engine) {
     engine.registerObjectMethod("string", "bool isEmpty() const", &ASString.isEmpty, CallConv.DDeclObjFirst);
     engine.registerObjectMethod("string", "uint resize(uint size) const", &ASString.resize, CallConv.DDeclObjFirst);
     engine.registerObjectMethod("string", "string &substr(uint start = 0, uint count = -1) const", &asSubstr, CallConv.DDeclObjLast);
+
+    // Conversion functionality
+    import std.conv : text;
+    engine.registerGlobalFunction("string &intToString(int64 value)", (long value) { return StringPtr(value.text); });
+    engine.registerGlobalFunction("string &uintToString(uint64 value)", (ulong value) { return StringPtr(value.text); });
+    engine.registerGlobalFunction("string &floatToString(double value)", (double value) { return StringPtr(value.text); });
 }
