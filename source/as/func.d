@@ -4,6 +4,77 @@ import as.engine;
 import as.mod;
 import std.string;
 
+/**
+    Supported calling conventions
+*/
+enum CallConv : asECallConvTypes {
+    
+    /**
+        The CDECL standard calling convention
+    */
+	CDecl = asECallConvTypes.asCALL_CDECL,
+
+    /**
+        The STDCall calling convention
+    */
+	STDCall = asECallConvTypes.asCALL_STDCALL,
+
+    /**
+        The ThisCall calling convention that emulates a global object
+    */
+	ThisCallASGlobal = asECallConvTypes.asCALL_THISCALL_ASGLOBAL,
+
+    /**
+        The ThisCall calling convention
+    */
+	ThisCall = asECallConvTypes.asCALL_THISCALL,
+
+    /**
+        CDECL calling convention where object pointer is the first int argument
+    */
+	CDeclObjFirst = asECallConvTypes.asCALL_CDECL_OBJFIRST,
+
+    /**
+        CDECL calling convention where the object pointer is the last int argument
+    */
+	CDeclObjLast = asECallConvTypes.asCALL_CDECL_OBJLAST,
+
+    /**
+        The Generic calling convention, requires writing specialized code to handle it
+    */
+	Generic = asECallConvTypes.asCALL_GENERIC,
+
+    /**
+        ThisCall calling convention where the object pointer is the last int argument
+    */
+	ThisCallObjLast = asECallConvTypes.asCALL_THISCALL_OBJLAST,
+
+    /**
+        ThisCall calling convention where the object pointer is the last int argument
+    */
+	ThisCallObjFirst = asECallConvTypes.asCALL_THISCALL_OBJFIRST,
+
+    /**
+        The DDECL standard calling convention
+
+        DDECL is CDECL but with int registers in reverse order
+    */
+	DDecl = asECallConvTypes.asCALL_DDECL,
+
+    /**
+        DDECL calling convention where the object pointer is the last int argument
+    */
+	DDeclObjLast = asECallConvTypes.asCALL_DDECL_OBJLAST,
+
+    /**
+        DDECL calling convention where the object pointer is the last int argument
+    */
+	DDeclObjFirst = asECallConvTypes.asCALL_DDECL_OBJFIRST,
+}
+
+/**
+    Function types
+*/
 enum FuncType : asEFuncType {
     /**
         A dummy no-op function

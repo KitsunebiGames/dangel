@@ -8,11 +8,6 @@ public import as.context;
 public import as.tinf;
 public import as.obj;
 
-enum CDECL = asECallConvTypes.asCALL_CDECL;
-enum DCall = asECallConvTypes.asCALL_DDECL;
-enum DCallObjLast = asECallConvTypes.asCALL_DDECL_OBJLAST;
-enum DCallObjFirst = asECallConvTypes.asCALL_DDECL_OBJFIRST;
-
 /**
     Gets the version of the angelscript library
 */
@@ -25,6 +20,61 @@ string getLibraryVersion() {
 */
 string getLibraryOptions() {
     return cast(string)asGetLibraryOptions().fromStringz;
+}
+
+/**
+    Shorthand for CallConv.CDecl
+*/
+enum CDECL = CallConv.CDecl;
+
+/**
+    Shorthand for CallConv.DDecl
+*/
+enum DCall = CallConv.DDecl;
+
+/**
+    Shorthand for CallConv.DDeclObjLast
+*/
+enum DCallObjLast = CallConv.DDeclObjLast;
+
+/**
+    Shorthand for CallConv.DDeclObjFirst
+*/
+enum DCallObjFirst = CallConv.DDeclObjFirst;
+
+/**
+    All the error codes AngelScript can return
+*/
+enum ReturnCodes : asERetCodes {
+	Success = asERetCodes.asSUCCESS,
+	Error = asERetCodes.asERROR,
+	ContextActive = asERetCodes.asCONTEXT_ACTIVE,
+	ContextNotFinished = asERetCodes.asCONTEXT_NOT_FINISHED,
+	ContextNotPrepared = asERetCodes.asCONTEXT_NOT_PREPARED,
+	InvalidArg = asERetCodes.asINVALID_ARG,
+	NoFunction = asERetCodes.asNO_FUNCTION,
+	NotSupported = asERetCodes.asNOT_SUPPORTED,
+	InvalidName = asERetCodes.asINVALID_NAME,
+	NameTaken = asERetCodes.asNAME_TAKEN,
+	InvalidDeclaration = asERetCodes.asINVALID_DECLARATION,
+	InvalidObject = asERetCodes.asINVALID_OBJECT,
+	InvalidType = asERetCodes.asINVALID_TYPE,
+	AlreadyRegistered = asERetCodes.asALREADY_REGISTERED,
+	MultipleFunctions = asERetCodes.asMULTIPLE_FUNCTIONS,
+	NoModule = asERetCodes.asNO_MODULE,
+	NoGlobalVar = asERetCodes.asNO_GLOBAL_VAR,
+	InvalidConfiguration = asERetCodes.asINVALID_CONFIGURATION,
+	InvalidInterface = asERetCodes.asINVALID_INTERFACE,
+	CantBindAllFunctions = asERetCodes.asCANT_BIND_ALL_FUNCTIONS,
+	LowerArrayDimensionNotRegistered = asERetCodes.asLOWER_ARRAY_DIMENSION_NOT_REGISTERED,
+	WrongConfigGroup = asERetCodes.asWRONG_CONFIG_GROUP,
+	ConfigGroupInUse = asERetCodes.asCONFIG_GROUP_IS_IN_USE,
+	IllegalBehaviourForType = asERetCodes.asILLEGAL_BEHAVIOUR_FOR_TYPE,
+	WrongCallingConv = asERetCodes.asWRONG_CALLING_CONV,
+	BuildInProgress = asERetCodes.asBUILD_IN_PROGRESS,
+	InitGlobalVarsFailed = asERetCodes.asINIT_GLOBAL_VARS_FAILED,
+	OutOfMemory = asERetCodes.asOUT_OF_MEMORY,
+	ModuleInUse = asERetCodes.asMODULE_IS_IN_USE
 }
 
 /**

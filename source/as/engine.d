@@ -185,7 +185,7 @@ public:
     /**
         Registers an object type
     */
-    void registerObjectType(string name, int byteSize, asDWORD flags) {
+    void registerObjectType(string name, int byteSize, TypeFlags flags) {
         int err = asEngine_RegisterObjectType(engine, name.toStringz, byteSize, flags);
         assert(err != asERetCodes.asINVALID_ARG, "Invalid flags");
         assert(err != asERetCodes.asINVALID_NAME, "Invalid name");
@@ -210,7 +210,7 @@ public:
     /**
         Registers a method for an object
     */
-    void registerObjectMethod(T)(string obj, string decl, T func, asDWORD callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
+    void registerObjectMethod(T)(string obj, string decl, T func, CallConv callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
         int err = asEngine_RegisterObjectMethod(engine, obj.toStringz, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
         assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
         assert(err != asERetCodes.asNOT_SUPPORTED, "The calling convention is not supported");
@@ -225,7 +225,7 @@ public:
     /**
         Registers a behaviour for an object
     */
-    void registerObjectBehaviour(T)(string obj, asEBehaviours behaviour, string decl, T func, asDWORD callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
+    void registerObjectBehaviour(T)(string obj, Behaviours behaviour, string decl, T func, CallConv callConv = DCall, void* aux = null) if (isFunctionPointer!T) {
         int err = asEngine_RegisterObjectBehaviour(engine, obj.toStringz, behaviour, decl.toStringz, cast(asFUNCTION_t)func, callConv, aux);
         assert(err != asERetCodes.asWRONG_CONFIG_GROUP, "Object type was registered in a different config group");
         assert(err != asERetCodes.asINVALID_ARG, "obj not set, global behaviour given in behaviour or the objForThiscall pointer wasn't set correctly");
