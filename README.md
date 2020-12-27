@@ -1,12 +1,12 @@
 # DAngel
 D bindings and wrapper for AngelScript with support for D strings.
 
-Do note this is still work in progress and there's currently issues with D calling conventions breaking with angelscript (will be working on patching angelscript to support D calling conventions)
+Note that this library is still work in progress
 
-This library also depends on a patched C binding to angelscript that you will need to compile first, you can find that [here](https://github.com/KitsunebiGames/angelscriptc) you will also need the [patched AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) (GCC only right now!) 
+This library also depends on a patched C binding to angelscript that you will need to compile first, you can find that [here](https://github.com/KitsunebiGames/angelscriptc) you will also need the [patched AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl)
 
 # Using the binding
-First compile the patched [AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) and the [patched c bindings](https://github.com/KitsunebiGames/angelscriptc) **AS DYNAMIC LIBRARIES** and install the libraries to your system's library path (or whatever the heck you do on Windows)
+First compile the patched [AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) and the [patched c bindings](https://github.com/KitsunebiGames/angelscriptc) and install the libraries to your system's library path, on Windows it's recommended to use precompiled static libraries which will be provided asap.
 
 Then put the libraries somewhere that the D linker will be able to find them, in my case that's `/usr/lib` and `/usr/include`. You may want to ship the libraries with your application.
 
