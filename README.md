@@ -6,7 +6,7 @@ Note that this library is still work in progress
 This library also depends on a patched C binding to angelscript that you will need to compile first, you can find that [here](https://github.com/KitsunebiGames/angelscriptc) you will also need the [patched AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl)
 
 # Using the binding
-First compile the patched [AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) and the [patched c bindings](https://github.com/KitsunebiGames/angelscriptc) and install the libraries to your system's library path, on Windows it's recommended to use precompiled static libraries which will be provided asap.
+First compile the patched [AngelScript with D ABI support](https://github.com/KitsunebiGames/angelscript-ddecl) and the [patched c bindings](https://github.com/KitsunebiGames/angelscriptc) and install the libraries to your system's library path, on Windows it's recommended to use precompiled static libraries, which are included on 64 bit Windows installations automatically.
 
 Then put the libraries somewhere that the D linker will be able to find them, in my case that's `/usr/lib` and `/usr/include`. You may want to ship the libraries with your application.
 
