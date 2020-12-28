@@ -122,20 +122,23 @@ public:
         Gets a function by index
     */
     Function getFunctionByIndex(asUINT index) {
-        return new Function(engine, asModule_GetFunctionByIndex(mod, index));
+        auto funcPtr = asModule_GetFunctionByIndex(mod, index);
+        return funcPtr is null ? null : new Function(engine, this, funcPtr);
     }
 
     /**
         Gets function by declaration
     */
     Function getFunctionByDecl(string decl) {
-        return new Function(engine, asModule_GetFunctionByDecl(mod, decl.toStringz));
+        auto funcPtr = asModule_GetFunctionByDecl(mod, decl.toStringz);
+        return funcPtr is null ? null : new Function(engine, this, funcPtr);
     }
 
     /**
         Gets function by name
     */
     Function getFunctionByName(string name) {
-        return new Function(engine, asModule_GetFunctionByName(mod, name.toStringz));
+        auto funcPtr = asModule_GetFunctionByName(mod, name.toStringz);
+        return funcPtr is null ? null : new Function(engine, this, funcPtr);
     }
 }
