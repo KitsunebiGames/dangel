@@ -4,3 +4,10 @@ authors "Luna Nielsen"
 copyright "Copyright © 2020, Luna Nielsen"
 license "BSD 2-Clause"
 libs "as_c" "angelscript"
+
+// Sensible out folder
+targetPath "out/"
+
+// Link to Angelscript
+sourceFiles "libs/angelscript.lib" "libs/as_c.lib" platform="windows-x86_64"
+copyFiles "libs/COPYING-Angelscript"

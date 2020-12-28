@@ -17,3 +17,5 @@ dangel-test-*
 *.so
 
 dub.selections.json
+
+out/
